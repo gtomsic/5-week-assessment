@@ -34,16 +34,30 @@ module.exports = {
       );
       res.status(200).send(response[0]);
     } catch (error) {
-      console.log('Create City Error', error);
+      console.log('createCity ', error);
     }
   },
   getCities: async (req, res) => {
-    const response = await db.query(`
-        SELECT cities.name AS city, cities.rating, countries.country_id, countries.name AS country
+    try {
+      const response = await db.query(`
+        SELECT cities.name AS city, cities.city_id AS city_id, cities.rating, countries.country_id as country_id, countries.name AS country
         FROM cities
         JOIN countries ON countries.country_id = cities.country_id;
     `);
-    res.status(200).send(response[0]);
+      res.status(200).send(response[0]);
+    } catch (error) {
+      console.log('getCities Error', error);
+    }
+  },
+  deleteCity: async (req, res) => {
+    try {
+      const response = await db.query(
+        `DELETE FROM cities WHERE city_id = ${req.params.id}`
+      );
+      res.status(200).send(response[0]);
+    } catch (error) {
+      console.log('deleteCity Error ', error);
+    }
   },
   seed: (req, res) => {
     db.query(
