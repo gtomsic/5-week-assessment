@@ -11,6 +11,39 @@ const db = new Sequelize(CONNECTION_STRING, {
 });
 
 module.exports = {
+  getCountries: async (req, res) => {
+    try {
+      const response = await db.query(`
+                SELECT * FROM countries;
+            `);
+      res.status(200).send(response[0]);
+    } catch (error) {
+      console.log('getCountries Error ', error);
+    }
+  },
+  createCity: async (req, res) => {
+    console.log(req.body);
+    try {
+      const { name, rating, countryId } = req.body;
+      const response = await db.query(
+        `
+            INSERT INTO cities(name, rating, country_id)
+            VALUES(${name}, ${rating}, ${countryId}) RETURNING *;
+          `
+      );
+      res.status(200).send(response[0]);
+    } catch (error) {
+      console.log('Create City Error', error);
+    }
+  },
+  getCities: async (req, res) => {
+    const response = await db.query(`
+        SELECT cities.name AS city, cities.rating, countries.country_id, countries.name AS country
+        FROM cities
+        JOIN countries ON countries.country_id = cities.country_id;
+    `);
+    res.status(200).send(response[0]);
+  },
   seed: (req, res) => {
     db.query(
       `
@@ -23,11 +56,11 @@ module.exports = {
             );
 
             CREATE TABLE cities(
-                city_id SERIAL PRIMARY KEY,
-                name VARCHAR(200), 
-                rating: integer,
-                country_id: REFERENCES countries(country_id)
-            )
+              city_id SERIAL PRIMARY KEY,
+              name VARCHAR,
+              rating INTEGER,
+              country_id INTEGER REFERENCES countries(country_id)  
+            );
 
             insert into countries (name)
             values ('Afghanistan'),
@@ -231,6 +264,6 @@ module.exports = {
         console.log('DB seeded!');
         res.sendStatus(200);
       })
-      .catch((err) => console.log('error seeding DB'.red.inverse, err));
+      .catch((err) => console.log('error seeding DB', err));
   },
 };
