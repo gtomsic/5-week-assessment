@@ -42,7 +42,9 @@ module.exports = {
       const response = await db.query(`
         SELECT cities.name AS city, cities.city_id AS city_id, cities.rating, countries.country_id as country_id, countries.name AS country
         FROM cities
-        JOIN countries ON countries.country_id = cities.country_id;
+        JOIN countries ON countries.country_id = cities.country_id 
+        ORDER BY cities.rating DESC;
+        ;
     `);
       res.status(200).send(response[0]);
     } catch (error) {
@@ -278,7 +280,6 @@ module.exports = {
             VALUES('Manila', 4, 24),
             ('Salt Lake City', 5, 20),
             ('Chicago', 3, 3);
-
         `
     )
       .then(() => {
