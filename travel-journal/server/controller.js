@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { CONNECTION_STRING } = process.env;
+const { INTEGER } = require('sequelize');
 const Sequelize = require('sequelize');
 const db = new Sequelize(CONNECTION_STRING, {
   dialect: 'postgres',
@@ -27,8 +28,8 @@ module.exports = {
       const { name, rating, countryId } = req.body;
       const response = await db.query(
         `
-            INSERT INTO cities(name, rating, country_id)
-            VALUES(${name}, ${rating}, ${countryId}) RETURNING *;
+            INSERT INTO cities (name, rating, country_id)
+            VALUES('${name}', ${rating}, ${countryId});
           `
       );
       res.status(200).send(response[0]);
@@ -57,7 +58,7 @@ module.exports = {
 
             CREATE TABLE cities(
               city_id SERIAL PRIMARY KEY,
-              name VARCHAR,
+              name VARCHAR(255),
               rating INTEGER,
               country_id INTEGER REFERENCES countries(country_id)  
             );
